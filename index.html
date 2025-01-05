@@ -64,7 +64,7 @@
 <body>
     <div class="container">
         <h2 id="form-title">Login</h2>
-        <form id="auth-form" action="/login" method="post">
+        <form id="auth-form" action="http://200.176.19.196:5000/login" method="post">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
@@ -84,7 +84,7 @@
             e.preventDefault();
             if (authForm.action.endsWith('/login')) {
                 formTitle.textContent = 'Cadastro';
-                authForm.action = '/register';
+                authForm.action = 'http://200.176.19.196:5000/register';
                 toggleText.textContent = 'Já tem uma conta? ';
                 toggleLink.textContent = 'Faça login';
                 authForm.innerHTML = `
@@ -95,7 +95,7 @@
                 `;
             } else {
                 formTitle.textContent = 'Login';
-                authForm.action = '/login';
+                authForm.action = 'http://200.176.19.196:5000/login';
                 toggleText.textContent = 'Não tem uma conta? ';
                 toggleLink.textContent = 'Cadastre-se';
                 authForm.innerHTML = `
