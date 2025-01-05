@@ -105,6 +105,33 @@
                 `;
             }
         });
+
+        // Redirecionar após o cadastro bem-sucedido
+        authForm.addEventListener('submit', async (e) => {
+            if (authForm.action.endsWith('/register')) {
+                e.preventDefault();
+                const formData = new FormData(authForm);
+                const response = await fetch(authForm.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Cadastro realizado com sucesso! Redirecionando para a página de login.');
+                    formTitle.textContent = 'Login';
+                    authForm.action = '/login';
+                    toggleText.textContent = 'Não tem uma conta? ';
+                    toggleLink.textContent = 'Cadastre-se';
+                    authForm.innerHTML = `
+                        <input type="text" name="username" placeholder="Username" required>
+                        <input type="password" name="password" placeholder="Password" required>
+                        <button type="submit">Login</button>
+                    `;
+                } else {
+                    alert('Erro no cadastro. Tente novamente.');
+                }
+            }
+        });
     </script>
 </body>
 </html>
