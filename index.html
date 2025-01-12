@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -106,7 +106,6 @@
         .social {
             background-color: #17a2b8;
         }
-
         /* Animation Styles */
         .opening {
             position: fixed;
@@ -226,11 +225,13 @@
         let cart = [];
         const totalElement = document.getElementById('total');
         
+        // Função para adicionar ao carrinho
         function addToCart(itemName, itemPrice) {
             cart.push({ name: itemName, price: itemPrice });
             updateCart();
         }
 
+        // Atualiza o carrinho e o total
         function updateCart() {
             const cartItemsElement = document.querySelector('.cart-items');
             cartItemsElement.innerHTML = '';
@@ -245,5 +246,36 @@
             totalElement.textContent = total.toFixed(2);
         }
 
-        // Mercado Pago Button
-        const mp = new MercadoPago('PUBLIC_KEY', { locale: 'pt-BR' });
+        // Função de integração com Mercado Pago
+        const mp = new MercadoPago('YOUR_PUBLIC_KEY', {
+            locale: 'pt-BR'
+        });
+
+        function createPayment() {
+            mp.checkout({
+                preference: {
+                    items: cart.map(item => ({
+                        title: item.name,
+                        unit_price: item.price,
+                        quantity: 1
+                    }))
+                }
+            }).then(function (response) {
+                const paymentLink = response.response.init_point;
+                window.location.href = paymentLink;
+            }).catch(function (error) {
+                console.error(error);
+            });
+        }
+
+        // Renderização do botão do Mercado Pago
+        document.addEventListener('DOMContentLoaded', function () {
+            const mercadoPagoButton = document.getElementById('mercado-pago-button');
+            const button = document.createElement('button');
+            button.textContent = 'Finalizar Compra';
+            button.onclick = createPayment;
+            mercadoPagoButton.appendChild(button);
+        });
+    </script>
+</body>
+</html>
