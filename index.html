@@ -106,50 +106,10 @@
         .social {
             background-color: #17a2b8;
         }
-        /* Animation Styles */
-        .opening {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #333;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeOut 2s ease-in-out forwards;
-            animation-delay: 3s;
-        }
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-        .opening h1 {
-            font-size: 3rem;
-            animation: slideIn 2s ease;
-        }
-        @keyframes slideIn {
-            0% {
-                transform: translateY(-100%);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
     </style>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
-    <div class="opening">
-        <h1>Bem-vindo ao Restaurante Elegante</h1>
-    </div>
     <header>
         <h1>Cardápio do Restaurante</h1>
     </header>
@@ -197,18 +157,6 @@
         </div>
     </section>
 
-    <section id="galeria" class="menu">
-        <h2>Galeria</h2>
-        <div class="menu-item">
-            <img src="https://via.placeholder.com/200x120" alt="Foto 1">
-            <h3>Ambiente 1</h3>
-        </div>
-        <div class="menu-item">
-            <img src="https://via.placeholder.com/200x120" alt="Foto 2">
-            <h3>Ambiente 2</h3>
-        </div>
-    </section>
-
     <section class="cart">
         <h2>Carrinho de Compras</h2>
         <ul class="cart-items"></ul>
@@ -252,28 +200,30 @@
         });
 
         function createPayment() {
-            mp.checkout({
-                preference: {
-                    items: cart.map(item => ({
-                        title: item.name,
-                        unit_price: item.price,
-                        quantity: 1
-                    }))
-                }
-            }).then(function (response) {
-                const paymentLink = response.response.init_point;
-                window.location.href = paymentLink;
-            }).catch(function (error) {
-                console.error(error);
+            // Cria a preferência de pagamento
+            const preference = {
+                items: cart.map(item => ({
+                    title: item.name,
+                    unit_price: item.price,
+                    quantity: 1
+                }))
+            };
+
+            // Solicita a criação da preferência
+            mp.preference.create(preference).then(function(response) {
+                const paymentLink = response.body.init_point;
+                window.location.href = paymentLink; // Redireciona para o pagamento
+            }).catch(function(error) {
+                console.error("Erro ao criar preferência:", error);
             });
         }
 
-        // Renderização do botão do Mercado Pago
+        // Renderiza o botão do Mercado Pago
         document.addEventListener('DOMContentLoaded', function () {
             const mercadoPagoButton = document.getElementById('mercado-pago-button');
             const button = document.createElement('button');
             button.textContent = 'Finalizar Compra';
-            button.onclick = createPayment;
+            button.onclick = createPayment; // Chama a função para criar a preferência
             mercadoPagoButton.appendChild(button);
         });
     </script>
