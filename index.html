@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,21 +93,18 @@
             text-align: center;
             margin: 1rem 0;
         }
-        .buttons a {
-            margin: 0 0.5rem;
-            text-decoration: none;
+        .buttons button {
+            background-color: #007bff;
             color: white;
+            border: none;
             padding: 0.5rem 1rem;
             border-radius: 4px;
+            cursor: pointer;
         }
-        .location {
-            background-color: #007bff;
-        }
-        .social {
-            background-color: #17a2b8;
+        .buttons button:hover {
+            background-color: #0056b3;
         }
     </style>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
     <header>
@@ -116,7 +113,6 @@
     <nav>
         <a href="#cardapio">Cardápio</a>
         <a href="#bebidas">Bebidas</a>
-        <a href="#galeria">Galeria</a>
     </nav>
 
     <section id="cardapio" class="menu">
@@ -133,98 +129,64 @@
             <p>R$ 25,00</p>
             <button onclick="addToCart('Prato 2', 25)">Adicionar ao Carrinho</button>
         </div>
-        <div class="menu-item">
-            <img src="https://via.placeholder.com/200x120" alt="Prato 3">
-            <h3>Prato 3</h3>
-            <p>R$ 30,00</p>
-            <button onclick="addToCart('Prato 3', 30)">Adicionar ao Carrinho</button>
-        </div>
-    </section>
-
-    <section id="bebidas" class="menu">
-        <h2>Bebidas</h2>
-        <div class="menu-item">
-            <img src="https://via.placeholder.com/200x120" alt="Bebida 1">
-            <h3>Bebida 1</h3>
-            <p>R$ 5,00</p>
-            <button onclick="addToCart('Bebida 1', 5)">Adicionar ao Carrinho</button>
-        </div>
-        <div class="menu-item">
-            <img src="https://via.placeholder.com/200x120" alt="Bebida 2">
-            <h3>Bebida 2</h3>
-            <p>R$ 7,00</p>
-            <button onclick="addToCart('Bebida 2', 7)">Adicionar ao Carrinho</button>
-        </div>
     </section>
 
     <section class="cart">
         <h2>Carrinho de Compras</h2>
         <ul class="cart-items"></ul>
         <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
-        <div id="mercado-pago-button"></div>
+        <div class="buttons">
+            <button id="finalize-purchase">Finalizar Compra</button>
+        </div>
     </section>
-    <div class="buttons">
-        <a class="location" href="https://www.google.com/maps" target="_blank">Localização</a>
-        <a class="social" href="https://www.instagram.com" target="_blank">Instagram</a>
-        <a class="social" href="https://www.facebook.com" target="_blank">Facebook</a>
-    </div>
 
     <script>
         let cart = [];
-        const totalElement = document.getElementById('total');
-        
-        // Função para adicionar ao carrinho
-        function addToCart(itemName, itemPrice) {
-            cart.push({ name: itemName, price: itemPrice });
+
+        function addToCart(name, price) {
+            cart.push({ title: name, unit_price: price, quantity: 1 });
             updateCart();
         }
 
-        // Atualiza o carrinho e o total
         function updateCart() {
-            const cartItemsElement = document.querySelector('.cart-items');
-            cartItemsElement.innerHTML = '';
+            const cartItemsContainer = document.querySelector(".cart-items");
+            cartItemsContainer.innerHTML = "";
             let total = 0;
+
             cart.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.classList.add('cart-item');
-                listItem.textContent = `${item.name} - R$ ${item.price}`;
-                cartItemsElement.appendChild(listItem);
-                total += item.price;
+                const listItem = document.createElement("li");
+                listItem.className = "cart-item";
+                listItem.textContent = `${item.title} - R$ ${item.unit_price}`;
+                cartItemsContainer.appendChild(listItem);
+                total += item.unit_price * item.quantity;
             });
-            totalElement.textContent = total.toFixed(2);
+
+            document.getElementById("total").textContent = total.toFixed(2);
         }
 
-        // Função de integração com Mercado Pago
-        const mp = new MercadoPago('APP_USR-e62ceac4-6b8c-41fd-95f1-96101c0c9b9a', {
-            locale: 'pt-BR'
-        });
+        document.getElementById("finalize-purchase").addEventListener("click", async () => {
+            if (cart.length === 0) {
+                alert("O carrinho está vazio!");
+                return;
+            }
 
-        function createPayment() {
-            // Cria a preferência de pagamento
-            const preference = {
-                items: cart.map(item => ({
-                    title: item.name,
-                    unit_price: item.price,
-                    quantity: 1
-                }))
-            };
+            try {
+                const response = await fetch("http://200.176.19.196:5000/create_preference", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ items: cart })
+                });
 
-            // Solicita a criação da preferência
-            mp.preference.create(preference).then(function(response) {
-                const paymentLink = response.body.init_point;
-                window.location.href = paymentLink; // Redireciona para o pagamento
-            }).catch(function(error) {
-                console.error("Erro ao criar preferência:", error);
-            });
-        }
+                if (!response.ok) {
+                    throw new Error("Erro ao criar a preferência de pagamento.");
+                }
 
-        // Renderiza o botão do Mercado Pago
-        document.addEventListener('DOMContentLoaded', function () {
-            const mercadoPagoButton = document.getElementById('mercado-pago-button');
-            const button = document.createElement('button');
-            button.textContent = 'Finalizar Compra';
-            button.onclick = createPayment; // Chama a função para criar a preferência
-            mercadoPagoButton.appendChild(button);
+                const data = await response.json();
+                window.location.href = data.init_point; // Redireciona para o checkout do Mercado Pago
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao processar o pagamento.");
+            }
         });
     </script>
 </body>
