@@ -213,7 +213,7 @@
     <section class="cart">
         <h2>Carrinho de Compras</h2>
         <ul class="cart-items"></ul>
-        <p><strong>Total: R$ <span id="total">0</span></strong></p>
+        <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
         <div id="mercado-pago-button"></div>
     </section>
     <div class="buttons">
@@ -223,49 +223,27 @@
     </div>
 
     <script>
-    let cart = [];
-    let total = 0;
+        let cart = [];
+        const totalElement = document.getElementById('total');
+        
+        function addToCart(itemName, itemPrice) {
+            cart.push({ name: itemName, price: itemPrice });
+            updateCart();
+        }
 
-    function addToCart(itemName, itemPrice) {
-        // Adiciona o item ao carrinho
-        cart.push({ name: itemName, price: itemPrice });
+        function updateCart() {
+            const cartItemsElement = document.querySelector('.cart-items');
+            cartItemsElement.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('cart-item');
+                listItem.textContent = `${item.name} - R$ ${item.price}`;
+                cartItemsElement.appendChild(listItem);
+                total += item.price;
+            });
+            totalElement.textContent = total.toFixed(2);
+        }
 
-        // Atualiza o total
-        total += itemPrice;
-
-        // Atualiza o carrinho na interface
-        updateCartDisplay();
-    }
-
-    function updateCartDisplay() {
-        const cartItemsContainer = document.querySelector('.cart-items');
-        const totalDisplay = document.getElementById('total');
-
-        // Limpa a exibição anterior
-        cartItemsContainer.innerHTML = '';
-
-        // Adiciona os itens ao elemento do carrinho
-        cart.forEach((item, index) => {
-            const itemElement = document.createElement('li');
-            itemElement.className = 'cart-item';
-            itemElement.innerHTML = `
-                ${item.name} - R$ ${item.price.toFixed(2)} 
-                <button onclick="removeFromCart(${index})">Remover</button>
-            `;
-            cartItemsContainer.appendChild(itemElement);
-        });
-
-        // Atualiza o total
-        totalDisplay.textContent = total.toFixed(2);
-    }
-
-    function removeFromCart(index) {
-        // Remove o item do carrinho
-        total -= cart[index].price;
-        cart.splice(index, 1);
-
-        // Atualiza a exibição do carrinho
-        updateCartDisplay();
-    }
-</script>
-
+        // Mercado Pago Button
+        const mp = new MercadoPago('PUBLIC_KEY', { locale: 'pt-BR' });
