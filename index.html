@@ -223,5 +223,49 @@
     </div>
 
     <script>
-        let cart = [];
-        let
+    let cart = [];
+    let total = 0;
+
+    function addToCart(itemName, itemPrice) {
+        // Adiciona o item ao carrinho
+        cart.push({ name: itemName, price: itemPrice });
+
+        // Atualiza o total
+        total += itemPrice;
+
+        // Atualiza o carrinho na interface
+        updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+        const cartItemsContainer = document.querySelector('.cart-items');
+        const totalDisplay = document.getElementById('total');
+
+        // Limpa a exibição anterior
+        cartItemsContainer.innerHTML = '';
+
+        // Adiciona os itens ao elemento do carrinho
+        cart.forEach((item, index) => {
+            const itemElement = document.createElement('li');
+            itemElement.className = 'cart-item';
+            itemElement.innerHTML = `
+                ${item.name} - R$ ${item.price.toFixed(2)} 
+                <button onclick="removeFromCart(${index})">Remover</button>
+            `;
+            cartItemsContainer.appendChild(itemElement);
+        });
+
+        // Atualiza o total
+        totalDisplay.textContent = total.toFixed(2);
+    }
+
+    function removeFromCart(index) {
+        // Remove o item do carrinho
+        total -= cart[index].price;
+        cart.splice(index, 1);
+
+        // Atualiza a exibição do carrinho
+        updateCartDisplay();
+    }
+</script>
+
