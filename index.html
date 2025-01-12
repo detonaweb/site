@@ -17,6 +17,23 @@
             padding: 1rem;
             text-align: center;
         }
+        nav {
+            background-color: #444;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
         .menu {
             display: flex;
             flex-wrap: wrap;
@@ -128,15 +145,23 @@
             }
         }
     </style>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
     <div class="opening">
-        <h1>Bem-vindo Associação dos Canoeiros de Porto Ferreira</h1>
+        <h1>Bem-vindo ao Restaurante Elegante</h1>
     </div>
     <header>
         <h1>Cardápio do Restaurante</h1>
     </header>
-    <section class="menu">
+    <nav>
+        <a href="#cardapio">Cardápio</a>
+        <a href="#bebidas">Bebidas</a>
+        <a href="#galeria">Galeria</a>
+    </nav>
+
+    <section id="cardapio" class="menu">
+        <h2>Cardápio</h2>
         <div class="menu-item">
             <img src="https://via.placeholder.com/200x120" alt="Prato 1">
             <h3>Prato 1</h3>
@@ -156,47 +181,47 @@
             <button onclick="addToCart('Prato 3', 30)">Adicionar ao Carrinho</button>
         </div>
     </section>
+
+    <section id="bebidas" class="menu">
+        <h2>Bebidas</h2>
+        <div class="menu-item">
+            <img src="https://via.placeholder.com/200x120" alt="Bebida 1">
+            <h3>Bebida 1</h3>
+            <p>R$ 5,00</p>
+            <button onclick="addToCart('Bebida 1', 5)">Adicionar ao Carrinho</button>
+        </div>
+        <div class="menu-item">
+            <img src="https://via.placeholder.com/200x120" alt="Bebida 2">
+            <h3>Bebida 2</h3>
+            <p>R$ 7,00</p>
+            <button onclick="addToCart('Bebida 2', 7)">Adicionar ao Carrinho</button>
+        </div>
+    </section>
+
+    <section id="galeria" class="menu">
+        <h2>Galeria</h2>
+        <div class="menu-item">
+            <img src="https://via.placeholder.com/200x120" alt="Foto 1">
+            <h3>Ambiente 1</h3>
+        </div>
+        <div class="menu-item">
+            <img src="https://via.placeholder.com/200x120" alt="Foto 2">
+            <h3>Ambiente 2</h3>
+        </div>
+    </section>
+
     <section class="cart">
         <h2>Carrinho de Compras</h2>
         <ul class="cart-items"></ul>
         <p><strong>Total: R$ <span id="total">0</span></strong></p>
+        <div id="mercado-pago-button"></div>
     </section>
     <div class="buttons">
-        <a class="location" href="https://maps.app.goo.gl/Z49V2wmym4D8n7AD9" target="_blank">Localização</a>
+        <a class="location" href="https://www.google.com/maps" target="_blank">Localização</a>
         <a class="social" href="https://www.instagram.com" target="_blank">Instagram</a>
         <a class="social" href="https://www.facebook.com" target="_blank">Facebook</a>
     </div>
 
     <script>
         let cart = [];
-        let total = 0;
-
-        function addToCart(item, price) {
-            cart.push({ item, price });
-            total += price;
-            updateCart();
-        }
-
-        function updateCart() {
-            const cartItems = document.querySelector('.cart-items');
-            const totalElement = document.getElementById('total');
-
-            cartItems.innerHTML = '';
-            cart.forEach((c, index) => {
-                const li = document.createElement('li');
-                li.className = 'cart-item';
-                li.innerHTML = `${c.item} - R$ ${c.price.toFixed(2)} <button onclick="removeFromCart(${index})">Remover</button>`;
-                cartItems.appendChild(li);
-            });
-
-            totalElement.textContent = total.toFixed(2);
-        }
-
-        function removeFromCart(index) {
-            total -= cart[index].price;
-            cart.splice(index, 1);
-            updateCart();
-        }
-    </script>
-</body>
-</html>
+        let
